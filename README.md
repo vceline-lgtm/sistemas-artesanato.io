@@ -16,3 +16,5 @@ Nome, Preço, Quantidade em estoque e Categoria.
 Já as vendas, devem possuir um Código da venda (identificador único), Data, Hora e Valor Total. Além disso, uma venda
 é composta por um ou mais produtos, e um mesmo produto pode aparecer em diversas vendas ao longo do tempo. No momento da
 venda de cada produto, deve-se registrar a Quantidade Vendida e o Preço Praticado.
+
+<img width="721" height="771" alt="image" src="https://github.com/user-attachments/assets/d5f31cb7-8dac-4de9-96ca-f68c9cae957e" />
