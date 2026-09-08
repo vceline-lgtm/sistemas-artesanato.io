@@ -17,4 +17,5 @@ Já as vendas, devem possuir um Código da venda (identificador único), Data, H
 é composta por um ou mais produtos, e um mesmo produto pode aparecer em diversas vendas ao longo do tempo. No momento da
 venda de cada produto, deve-se registrar a Quantidade Vendida e o Preço Praticado.
 
+<img width="751" height="803" alt="image" src="https://github.com/user-attachments/assets/575de0f8-2e27-440b-9e76-e03dbd2bacfe" />
 
