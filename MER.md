@@ -1,6 +1,8 @@
 # sistemas-artesanato.io
 ## sistemas de gerenciamento da loja de artesanato 'Amor & Arte'.
 
+### 1\. Contexto do sistema
+
 A loja "Amor & Arte" é um comércio especializado em vendas de produtos para artesanato, como fios e linhas para tricô
 ou crochê, agulhas para tapeçarias, tecidos, tintas para tecidos, tesouras, dentre outros produtos usados para a 
 confecção de produtos artesanais.   
