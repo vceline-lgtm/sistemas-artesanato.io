@@ -1,6 +1,6 @@
 # Sistema de Gestão - Loja de Artesanato "Amor &amp; Arte"
 ## 1\. Descrição do Minimundo
-Este projeto consiste no desenvolvimento do modelo de banco de dados para a \*\*Loja de Artesanato Amor &amp; Arte\*\*, um estabelecimento especializado na comercialização de produtos artesanais e suprimentos feitos à mão. O sistema tem como objetivo automatizar o controle de estoque de peças únicas, o cadastro de clientes e o registro detalhado das vendas realizadas.
+Este projeto consiste no desenvolvimento do modelo de banco de dados para a *Loja de Artesanato Amor &amp; Arte*, um estabelecimento especializado na comercialização de produtos artesanais e suprimentos feitos à mão. O sistema tem como objetivo automatizar o controle de estoque de peças únicas, o cadastro de clientes e o registro detalhado das vendas realizadas.
 
 ## 2\. Problema do Mundo Real a ser Resolvido
 Atualmente, o controle de vendas e estoque de artigos artesanais é feito de forma manual ou descentralizada. Isso gera problemas como inconsistência na quantidade de produtos disponíveis, dificuldade no acompanhamento do histórico de compras dos clientes e falta de controle sobre os valores praticados nas vendas de itens personalizados. O banco de dados visa centralizar essas informações, garantindo o rastreamento preciso de cada transação, a organização dos produtos por categorias e a identificação clara dos clientes. 
