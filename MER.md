@@ -1,23 +1,58 @@
 # sistemas-artesanato.io
-## sistemas de gerenciamento da loja de artesanato 'Amor & Arte'.
+## Especificação do Modelo de Entidade e Relacionamento (MER) - Amor &amp; Arte
 
-### 1\. Contexto do sistema
+## 1. Entidades
 
-A loja "Amor & Arte" é um comércio especializado em vendas de produtos para artesanato, como fios e linhas para tricô
-ou crochê, agulhas para tapeçarias, tecidos, tintas para tecidos, tesouras, dentre outros produtos usados para a 
-confecção de produtos artesanais.   
+* **Cliente**: Representa o consumidor que adquire as peças artesanais e materiais na loja.
+* **Venda**: Representa o registro de cada transação comercial/pedido efetuado na loja.
+* **Produto**: Representa os artigos artesanais e suprimentos disponíveis para comercialização.
+* **Categoria**: Representa a classificação e agrupamento dos produtos (ex: "Bordados", "Cerâmica", "Pintura em Tela").
 
-Para organizar suas operações, a loja necessita de um sistema para gerenciar o cadastro de clientes, o controle de
-estoque e o registro de vendas. O sistema deve manter o cadastro dos Clientes, registrando CPF (identificador único), 
-Nome, Telefone e E-mail. Cada cliente pode realizar várias vendas na loja, mas uma venda específica é associada a apenas
-um cliente.
+---
 
-Os produtos devem possuir os seguintes critérios para a realização da compra: Código do Produto (identificador único),
-Nome, Preço, Quantidade em estoque e Categoria.
+## 2. Relacionamentos e Cardinalidades
 
-Já as vendas, devem possuir um Código da venda (identificador único), Data, Hora e Valor Total. Além disso, uma venda
-é composta por um ou mais produtos, e um mesmo produto pode aparecer em diversas vendas ao longo do tempo. No momento da
-venda de cada produto, deve-se registrar a Quantidade Vendida e o Preço Praticado.
+* **[Cliente] (1) <realiza> (N) [Venda]**
+  * *Explicação*: Um Cliente pode realizar N Vendas na loja ao longo do tempo, mas cada Venda pertence a apenas 1 Cliente.
+* **[Venda] (N) <contém> (M) [Produto]**
+  * *Explicação*: Uma Venda pode conter M Produtos artesanais diferentes, e um mesmo Produto pode estar presente em N Vendas distintas.
+* **[Produto] (N) <pertence> (1) [Categoria]**
+  * *Explicação*: Vários Produtos (N) podem ser classificados em 1 Categoria, enquanto cada Categoria abrange N Produtos.
+
+---
+
+## 3. Sugestão de Atributos
+
+### Cliente
+* **`cpf`** (Chave Primária - PK): Identificador único do cliente.
+* `nome`: Nome completo do cliente.
+* `telefone`: Telefone de contato.
+* `email`: Endereço de e-mail do cliente.
+
+### Venda
+* **`cod_venda`** (Chave Primária - PK): Identificador único da compra/pedido.
+* `data_hora`: Data e horário de realização da venda.
+* `valor_total`: Valor total acumulado do pedido.
+
+### Produto
+* **`cod_produto`** (Chave Primária - PK): Identificador único do produto artesanal.
+* `nome_produto`: Nome e descrição da peça.
+* `preco`: Preço unitário cadastrado do produto.
+* `qtd_estoque`: Quantidade de unidades disponíveis em estoque.
+
+### Categoria
+* **`cod_categoria`** (Chave Primária - PK): Identificador único da categoria.
+* `nome_categoria`: Nome da categoria de artesanato.
+
+### Atributos do Relacionamento `contém`
+* **`quantidade_vendida`**: Quantidade de unidades daquele produto adquiridas na venda.
+* **`preco_praticado`**: Preço unitário efetivamente cobrado pela peça no momento daquela compra específica.
+
+---
+
+## 4. Diagrama Entidade e Relacionamento (DER)
+
+Abaixo está a representação visual do Modelo Entidade-Relacionamento Conceitual para a loja Amor & Arte:
 
 <img width="751" height="803" alt="image" src="https://github.com/user-attachments/assets/575de0f8-2e27-440b-9e76-e03dbd2bacfe" />
 
