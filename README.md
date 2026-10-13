@@ -1,4 +1,4 @@
-\# Sistema de Gestão - Loja de Artesanato "Amor &amp; Arte"
+# Sistema de Gestão - Loja de Artesanato "Amor &amp; Arte"
 ## 1\. Descrição do Minimundo
 Este projeto consiste no desenvolvimento do modelo de banco de dados para a \*\*Loja de Artesanato Amor &amp; Arte\*\*, um estabelecimento especializado na comercialização de produtos artesanais e suprimentos feitos à mão. O sistema tem como objetivo automatizar o controle de estoque de peças únicas, o cadastro de clientes e o registro detalhado das vendas realizadas.
 
