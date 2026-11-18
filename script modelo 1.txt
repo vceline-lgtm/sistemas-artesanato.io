@@ -1,0 +1,240 @@
+agora preciso fazer um script meu adaptado de um script já pronto, onde nele tem que ficar todo adaptado até mesmo os comentários contido nele. Script modelo obrigatório: -- =========================================================================
+-- AULA PRÁTICA: NORMALIZAÇÃO DE DADOS (1FN, 2FN e 3FN) E MAPEAMENTO DER->SQL
+-- Contexto: Módulo de Vendas / E-commerce 
+-- =========================================================================
+
+-- Remove o banco de dados se ele já existir para reiniciar os testes
+DROP DATABASE IF EXISTS VendasDB;
+
+-- Criação e seleção do banco de dados
+CREATE DATABASE VendasDB;
+USE VendasDB;
+
+
+-- =========================================================================
+-- CONCEITO DE NORMALIZAÇÃO DE DADOS
+-- "A chave, toda a chave, e nada além da chave!"
+-- =========================================================================
+
+
+-- =========================================================================
+-- 1. TABELA CLIENTE (Aplicando 1FN e 3FN)
+--
+-- CONCEITO DER INICIAL:
+-- O Cliente possui Atributo Composto (Endereço) e Atributo Multivalorado (E-mail).
+--
+-- APLICAÇÃO DA 1ª FORMA NORMAL (1FN - ATOMICIDADE):
+-- 1. Atributo Composto (Endereço): Foi DESMEMBRADO em suas partes simples e
+--    atômicas: logradouro, numero, bairro, cidade, uf e cep.
+-- 2. Atributo Multivalorado (E-mail): Um cliente pode ter N e-mails. Para não
+--    violar a 1FN (evitando criar colunas email1, email2 ou colocar múltiplos 
+--    e-mails na mesma célula separados por vírgula), o e-mail FOI REMOVIDO 
+--    desta tabela e virou uma nova tabela relacionada ('ClienteEmail').
+--
+-- APLICAÇÃO DA 3ª FORMA NORMAL (3FN - ELIMINAÇÃO DE DEPENDÊNCIA TRANSITIVA):
+-- 1. O nome do cliente NÃO depende de outro atributo não-chave.
+-- 2. Se tivéssemos colocado 'nome_cliente' na tabela PEDIDO, teríamos violado a 3FN!
+--    O 'nome_cliente' fica mantido APENAS na tabela CLIENTE.
+-- =========================================================================
+CREATE TABLE Cliente (
+  -- idCliente: Chave Primária Artificial (Surrogate Key)
+  idCliente INT UNSIGNED NOT NULL PRIMARY KEY,
+
+  -- Atributo Simples / Atômico
+  nome VARCHAR(125) NOT NULL,
+
+  -- ATRIBUTO COMPOSTO (ENDEREÇO) DESMEMBRADO (1FN):
+  -- Todos os campos são atômicos e indivisíveis.
+  logradouro VARCHAR(150) NOT NULL,
+  numero VARCHAR(10) NOT NULL,
+  bairro VARCHAR(60) NOT NULL,
+  cidade VARCHAR(60) NOT NULL,
+  uf CHAR(2) NOT NULL,
+  cep CHAR(8) NOT NULL
+);
+
+
+-- =========================================================================
+-- 1.1 TABELA CLIENTE_EMAIL (Solução da 1FN para Atributo Multivalorado)
+--
+-- CONCEITO:
+-- Como um Cliente pode ter zero, um ou múltiplos e-mails, criamos esta
+-- tabela associada. A chave primária é COMPOSTA (idCliente + email) para 
+-- evitar que o mesmo e-mail seja cadastrado duas vezes para o mesmo cliente.
+-- =========================================================================
+CREATE TABLE ClienteEmail (
+  idCliente INT UNSIGNED NOT NULL,
+  email VARCHAR(100) NOT NULL,
+
+  -- Chave Primária Composta
+  PRIMARY KEY (idCliente, email),
+
+  -- Chave Estrangeira com Integridade Referencial
+  CONSTRAINT fk_cliente_email
+    FOREIGN KEY (idCliente)
+    REFERENCES Cliente(idCliente)
+    ON DELETE CASCADE
+);
+
+
+-- =========================================================================
+-- 2. TABELA PRODUTO (Tabela Base para demonstrar a 2FN no Item do Pedido)
+-- =========================================================================
+CREATE TABLE Produto (
+  idProduto INT UNSIGNED NOT NULL PRIMARY KEY,
+  nomeProduto VARCHAR(100) NOT NULL,
+  precoUnitario DECIMAL(10,2) NOT NULL
+);
+
+
+-- =========================================================================
+-- 3. TABELA PEDIDO (Aplicando a 3FN - Dependência Transitiva)
+--
+-- APLICAÇÃO DA 3ª FORMA NORMAL (3FN):
+-- Regra: Nenhum atributo não-chave deve depender de outro atributo não-chave.
+--
+-- VIOLAÇÃO DA 3FN (O QUE NÃO FAZER):
+-- PEDIDO (idPedido, dataPedido, idCliente, nomeCliente)
+-- Problema: idPedido determina o idCliente. Porém, nomeCliente depende do idCliente.
+-- Isso geraria redundância e anomalias de atualização!
+--
+-- FORMA CORRETA (3FN APLICADA):
+-- Armazenamos apenas a FK 'idCliente'. O nome do cliente é obtido via JOIN.
+-- =========================================================================
+CREATE TABLE Pedido (
+  idPedido INT UNSIGNED NOT NULL PRIMARY KEY,
+  dataPedido DATE NOT NULL,
+  
+  -- FK ligando ao Cliente (3FN mantida)
+  idCliente INT UNSIGNED NOT NULL,
+
+  CONSTRAINT fk_pedido_cliente
+    FOREIGN KEY (idCliente)
+    REFERENCES Cliente(idCliente)
+);
+
+
+-- =========================================================================
+-- 4. TABELA ITEM_PEDIDO (Aplicando a 2ª FORMA NORMAL - 2FN)
+--
+-- CONCEITO: Relacionamento N:M entre Pedido e Produto.
+-- A Chave Primária é COMPOSTA: (idPedido, idProduto).
+--
+-- APLICAÇÃO DA 2ª FORMA NORMAL (2FN - DEPENDÊNCIA FUNCIONAL TOTAL):
+-- Regra: Todos os atributos não-chave devem depender da TOTALIDADE da PK Composta.
+--
+-- VIOLAÇÃO DA 2FN (O QUE NÃO FAZER):
+-- ITEM_PEDIDO (idPedido, idProduto, quantidade, precoPraticado, nomeProduto)
+-- Problema: 'nomeProduto' depende APENAS do 'idProduto' (dependência parcial de um pedaço da chave).
+--
+-- FORMA CORRETA (2FN APLICADA):
+-- 1. 'quantidade' e 'precoPraticado' dependem do Pedido E do Produto ao mesmo tempo.
+-- 2. 'nomeProduto' foi ISOLADO na tabela Produto!
+-- =========================================================================
+CREATE TABLE ItemPedido (
+  idPedido INT UNSIGNED NOT NULL,
+  idProduto INT UNSIGNED NOT NULL,
+  quantidade INT UNSIGNED NOT NULL,
+  precoPraticado DECIMAL(10,2) NOT NULL,
+  
+
+  -- Chave Primária Composta (2FN)
+  PRIMARY KEY (idPedido, idProduto),
+
+  -- Chaves Estrangeiras
+  CONSTRAINT fk_item_pedido
+    FOREIGN KEY (idPedido)
+    REFERENCES Pedido(idPedido),
+
+  CONSTRAINT fk_item_produto
+    FOREIGN KEY (idProduto)
+    REFERENCES Produto(idProduto)
+);
+
+
+-- =========================================================================
+-- 5. INSERÇÃO DE DADOS (DML) - POVOAMENTO DO BANCO DE DADOS
+-- =========================================================================
+
+-- Inserindo Clientes (1FN: Endereço Atômico desmembrado)
+INSERT INTO Cliente (idCliente, nome, logradouro, numero, bairro, cidade, uf, cep) VALUES
+(1, 'Carlos Eduardo Silva', 'Rua das Flores', '120', 'Centro', 'São Paulo', 'SP', '01001000'),
+(2, 'Maria Fernanda Oliveira', 'Av. Paulista', '1500', 'Bela Vista', 'São Paulo', 'SP', '01310100'),
+(3, 'João Pedro Santos', 'Rua Brasil', '45', 'Jardins', 'Campinas', 'SP', '13010000');
+
+-- Inserindo E-mails (1FN: Atributo Multivalorado resolvido em nova tabela)
+INSERT INTO ClienteEmail (idCliente, email) VALUES
+(1, 'carlos.silva@email.com'),
+(1, 'carlos.trabalho@email.com'), -- Carlos com 2 e-mails!
+(2, 'maria.fernanda@email.com');
+-- João Pedro (idCliente 3) não tem e-mail cadastrado ainda.
+
+-- Inserindo Produtos
+INSERT INTO Produto (idProduto, nomeProduto, precoUnitario) VALUES
+(10, 'Notebook Gamer', 4500.00),
+(20, 'Mouse Sem Fio', 120.00),
+(30, 'Teclado Mecânico', 350.00);
+
+-- Inserindo Pedidos (3FN: Apenas a FK idCliente)
+INSERT INTO Pedido (idPedido, dataPedido, idCliente) VALUES
+(101, '2026-03-01', 1),
+(102, '2026-03-02', 1),
+(103, '2026-03-05', 2);
+
+-- Inserindo Itens dos Pedidos (2FN: Atributos dependem de idPedido + idProduto)
+INSERT INTO ItemPedido (idPedido, idProduto, quantidade, precoPraticado) VALUES
+(101, 10, 1, 4500.00), -- Pedido 101 tem 1 Notebook
+(101, 20, 2, 120.00),  -- Pedido 101 tem 2 Mouses
+(102, 30, 1, 350.00),  -- Pedido 102 tem 1 Teclado
+(103, 20, 1, 120.00);  -- Pedido 103 tem 1 Mouse
+
+
+-- =========================================================================
+-- 6. CONSULTAS DEMONSTRATIVAS DAS FORMAS NORMAIS (DQL)
+-- =========================================================================
+
+-- -------------------------------------------------------------------------
+-- DEMONSTRAÇÃO DA 1FN (Consultando Atributos Multivalorados via JOIN)
+-- Exibe todos os e-mails do cliente Carlos Eduardo.
+-- -------------------------------------------------------------------------
+SELECT 
+    c.nome AS 'Cliente',
+    e.email AS 'E-mail Cadastrado'
+FROM Cliente c
+INNER JOIN ClienteEmail e ON c.idCliente = e.idCliente
+WHERE c.idCliente = 1;
+
+
+-- -------------------------------------------------------------------------
+-- DEMONSTRAÇÃO DA 2FN E 3FN (Reconstruindo as Informações via JOIN)
+-- Como não duplicamos o nome do cliente no pedido (3FN) e nem o nome do produto 
+-- nos itens (2FN), usamos JOIN para juntar as tabelas sem redundância de dados!
+-- -------------------------------------------------------------------------
+SELECT 
+    p.idPedido AS 'Nº Pedido',
+    p.dataPedido AS 'Data',
+    c.nome AS 'Cliente',
+    prod.nomeProduto AS 'Produto',
+    item.quantidade AS 'Qtd',
+    item.precoPraticado AS 'Preço Un.',
+    (item.quantidade * item.precoPraticado) AS 'Subtotal'
+FROM Pedido p
+INNER JOIN Cliente c ON p.idCliente = c.idCliente
+INNER JOIN ItemPedido item ON p.idPedido = item.idPedido
+INNER JOIN Produto prod ON item.idProduto = prod.idProduto
+ORDER BY p.idPedido;
+
+
+-- -------------------------------------------------------------------------
+-- DEMONSTRAÇÃO COM FILTROS E AGREGAÇÃO (WHERE, GROUP BY, COUNT)
+-- Exibe o total gasto por cada cliente nos seus pedidos.
+-- -------------------------------------------------------------------------
+SELECT 
+    c.nome AS 'Cliente',
+    COUNT(DISTINCT p.idPedido) AS 'Total de Pedidos',
+    SUM(item.quantidade * item.precoPraticado) AS 'Valor Total Gasto'
+FROM Cliente c
+INNER JOIN Pedido p ON c.idCliente = p.idCliente
+INNER JOIN ItemPedido item ON p.idPedido = item.idPedido
+GROUP BY c.idCliente, c.nome
+ORDER BY `Valor Total Gasto` DESC;
