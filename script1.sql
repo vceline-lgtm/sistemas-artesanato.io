@@ -259,4 +259,4 @@ INNER JOIN Venda v ON c.idCliente = v.idCliente
 INNER JOIN ItemVenda item ON v.idVenda = item.idVenda
 GROUP BY c.idCliente, c.nome, c.cpf
 ORDER BY `Valor Total Gasto` DESC;
-```
+=======

@@ -48,4 +48,3 @@ SELECT
 FROM cliente c 
 LEFT JOIN venda v ON c.id_cliente = v.id_cliente 
 WHERE v.id_venda IS NULL;
-
